@@ -7,6 +7,13 @@
     root.querySelectorAll?.('[data-d12-logo]').forEach(img=>{if(logoSrc&&img.src!==logoSrc)img.src=logoSrc;});
   }
 
+  function decoratePublicStatus(){
+    document.querySelectorAll('#publicStatus .status-hero,#scanResult .status-hero').forEach(hero=>{
+      if(!hero.querySelector('.status-branding'))hero.insertAdjacentHTML('afterbegin',`<div class="status-branding">${logoHtml('status-logo')}</div>`);
+      hydrateLogos(hero);
+    });
+  }
+
   function addPortalLogo(){
     const hero=document.querySelector('#view .status-hero');
     if(hero&&role==='member'&&!hero.querySelector('.portal-branding')){
@@ -19,7 +26,7 @@
     const previousRender=render;
     render=function(...args){
       const out=previousRender.apply(this,args);
-      requestAnimationFrame(addPortalLogo);
+      requestAnimationFrame(()=>{addPortalLogo();decoratePublicStatus();});
       return out;
     };
   }
@@ -49,6 +56,9 @@
     };
   }
 
+  const observer=new MutationObserver(()=>{addPortalLogo();decoratePublicStatus();});
+  observer.observe(document.body,{childList:true,subtree:true});
   hydrateLogos();
   addPortalLogo();
+  decoratePublicStatus();
 })();
