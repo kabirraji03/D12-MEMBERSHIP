@@ -1,0 +1,52 @@
+/* D12 Cue Club Membership V2.3.2 */
+.member-status-overview{
+  display:grid;grid-template-columns:1.35fr repeat(3,minmax(0,1fr));gap:10px;
+  margin:4px 0 18px;padding:14px;border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(108,92,231,.08));
+}
+.member-status-overview span{display:block;font-size:10px;font-weight:900;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+.member-status-primary,.member-status-stat{padding:12px 13px;border-radius:14px;background:rgba(255,255,255,.055);min-width:0}
+html:not(.dark) .member-status-primary,html:not(.dark) .member-status-stat{background:rgba(255,255,255,.72)}
+.member-status-primary>div{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.member-status-value{font-size:22px;letter-spacing:-.02em}
+.member-status-value.active{color:var(--green)}
+.member-status-value.soon{color:var(--amber)}
+.member-status-value.expired{color:var(--red)}
+.member-status-value.inactive{color:var(--muted)}
+.member-status-stat b{display:block;font-size:17px;overflow-wrap:anywhere}
+
+.membership-code-link{
+  display:grid;grid-template-columns:minmax(0,1fr) 164px;gap:12px;align-items:stretch;
+  margin:17px 0;text-decoration:none;color:inherit;
+}
+.code128-panel,.qr-code-panel{
+  background:#fff;border-radius:14px;padding:10px;display:flex;flex-direction:column;justify-content:center;
+}
+.code128-panel .barcode-box{margin:0;padding:8px 6px;border-radius:9px;box-shadow:none}
+.code-label{font-size:9px;font-weight:950;letter-spacing:.08em;color:#282828;text-align:center;margin-bottom:7px}
+.qr-code-panel{align-items:center;gap:4px}
+.qr-code-panel small{display:block;color:#444;text-align:center;font-size:8px;line-height:1.25}
+.qr-code-box{width:132px;height:132px;display:grid;place-items:center;background:#fff;overflow:hidden}
+.qr-code-box img,.qr-code-box canvas{display:block!important;width:132px!important;height:132px!important;max-width:100%}
+.qr-fallback{font-size:10px;color:#777;text-align:center}
+
+@media(max-width:760px){
+  .member-status-overview{grid-template-columns:1fr 1fr}
+  .member-status-primary{grid-column:1/-1}
+  .membership-code-link{grid-template-columns:1fr 145px}
+  .qr-code-box,.qr-code-box img,.qr-code-box canvas{width:116px!important;height:116px!important}
+  .qr-code-box{width:116px;height:116px}
+}
+@media(max-width:520px){
+  .member-status-overview{grid-template-columns:1fr 1fr;padding:10px;gap:8px}
+  .member-status-stat b{font-size:15px}
+  .membership-code-link{grid-template-columns:1fr;gap:8px}
+  .qr-code-panel{padding:12px}
+  .qr-code-box,.qr-code-box img,.qr-code-box canvas{width:132px!important;height:132px!important}
+  .qr-code-box{width:132px;height:132px}
+}
+@media print{
+  .membership-code-link{grid-template-columns:minmax(0,1fr) 150px!important;gap:8px!important}
+  .qr-code-box,.qr-code-box img,.qr-code-box canvas{width:118px!important;height:118px!important}
+  .qr-code-box{width:118px!important;height:118px!important}
+}
