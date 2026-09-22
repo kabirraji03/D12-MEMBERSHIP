@@ -1,0 +1,14 @@
+{
+  "name": "D12 Cue Club Membership",
+  "short_name": "D12 Membership",
+  "description": "D12 Cue Club membership management, member cards, renewals, payments and scanner.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "any",
+  "icons": [
+    {"src":"d12-app-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
