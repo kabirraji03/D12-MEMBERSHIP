@@ -1,0 +1,86 @@
+/* D12 Membership V3 — flagship dashboard, glowing navigation and interaction sounds */
+(function(){
+  const VERSION='3.0';
+  const SOUND_KEY='d12m_v3_sounds';
+  const logo=()=>window.D12_LOGO_SRC||'';
+  const E=v=>typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const cash=v=>typeof money==='function'?money(v):`₦${Number(v||0).toLocaleString('en-NG')}`;
+  const stat=m=>typeof statusOf==='function'?statusOf(m):{label:m?.membership_status||'INACTIVE',days:m?.days_remaining??null,paused:!!m?.perk_paused};
+  const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();
+  const avatar=(m,cls='v3-avatar')=>m?.photo_data?`<img class="${cls}" src="${m.photo_data}" alt="${E(m.full_name)}">`:`<div class="${cls} v3-avatar-fallback">${E(initials(m?.full_name))}</div>`;
+  const soundsOn=()=>localStorage.getItem(SOUND_KEY)!=='off';
+  let audioCtx=null;
+
+  function getAudio(){
+    if(!soundsOn())return null;
+    try{if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});return audioCtx}catch{return null}
+  }
+  function tone(freq,at,dur=.11,gain=.035,type='sine'){
+    const ctx=getAudio();if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+at;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,gain),t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+dur+.02)
+  }
+  function playSound(kind='soft'){
+    if(!soundsOn())return;
+    const seq={
+      login:[[392,0,.09,.025],[523.25,.07,.12,.028],[659.25,.15,.16,.025]],
+      member:[[523.25,0,.11,.035],[659.25,.08,.13,.035],[783.99,.17,.19,.03]],
+      payment:[[392,0,.10,.03],[523.25,.08,.12,.035],[659.25,.16,.17,.035]],
+      reminder:[[659.25,0,.09,.028],[880,.10,.12,.03],[1174.66,.20,.15,.025]],
+      award:[[523.25,0,.10,.035],[783.99,.09,.12,.04],[1046.5,.18,.20,.035]],
+      scan:[[880,0,.08,.025],[1174.66,.07,.10,.025]],
+      archive:[[293.66,0,.09,.025],[246.94,.10,.13,.022]],
+      danger:[[220,0,.10,.025],[196,.10,.14,.022]],
+      save:[[440,0,.08,.022],[554.37,.07,.10,.022]],soft:[[523.25,0,.08,.018]]
+    }[kind]||[[523.25,0,.08,.018]];seq.forEach(x=>tone(...x))
+  }
+  window.playD12Sound=playSound;
+  document.addEventListener('pointerdown',()=>getAudio(),{once:true,capture:true});document.addEventListener('keydown',()=>getAudio(),{once:true,capture:true});
+
+  if(typeof request==='function'){
+    const priorRequest=request;
+    request=async function(action,payload={},useAuth=true){
+      const result=await priorRequest(action,payload,useAuth);
+      const map={staff_login:'login',member_login:'login',add_member:'member',verify_payment:'payment',contact_member:'reminder',break_run_winner:'award',card_status:'scan',archive_member:'archive',restore_member:'save',delete_member:'danger',reject_payment:'danger',record_payment:'save',save_settings:'save',save_plan:'save',update_member:'save',save_member_photo:'save',reset_member_pin:'save',change_member_pin:'save',create_staff:'member',update_staff:'save',reset_staff_password:'save',backup_export:'soft',backup_restore:'save'};
+      if(map[action])queueMicrotask(()=>playSound(map[action]));return result
+    }
+  }
+
+  function svgIcon(name){
+    const icons={
+      dashboard:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+      members:'<circle cx="9" cy="8" r="3"/><path d="M3.8 19c.8-3.4 2.8-5.2 5.2-5.2s4.4 1.8 5.2 5.2"/><circle cx="17.3" cy="9.1" r="2.2"/><path d="M14.7 14.5c2.7-.8 5.2.9 5.8 3.8"/>',
+      payments:'<rect x="2.8" y="5" width="18.4" height="14" rx="3"/><path d="M3 9.5h18M7 15h4"/><circle cx="17.2" cy="14.6" r="1.4"/>',
+      renewals:'<path d="M19 7V3l-2 2a8 8 0 1 0 2.2 8M19 3h-4"/>',
+      scanner:'<path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M7 12h10M7 9v6M10 9v6M14 9v6M17 9v6"/>',
+      reports:'<path d="M5 20V10M10 20V5M15 20v-7M20 20V8M3 20h19"/>',
+      staff:'<circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.9-4.3 3.3-6.5 6.5-6.5s5.6 2.2 6.5 6.5M18.5 4.8l1.2 1.2 2-2"/>',
+      audit:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+      archive:'<path d="M4 7h16v13H4zM3 4h18v3H3zM9 11h6"/>',
+      dataadmin:'<ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6M4.5 11.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/>',
+      settings:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+      register:'<circle cx="9" cy="8" r="3"/><path d="M3.5 19c.8-3.5 2.8-5.3 5.5-5.3 1.5 0 2.8.5 3.8 1.5M18 13v7M14.5 16.5h7"/>',
+      status:'<circle cx="9" cy="8" r="3"/><path d="M3.5 19c.8-3.5 2.8-5.3 5.5-5.3 1.5 0 2.8.5 3.8 1.5M15 17l2 2 4-5"/>'
+    };
+    return `<span class="v3-nav-icon v3-icon-${name}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icons[name]||icons.dashboard}</svg></span>`
+  }
+  if(typeof navItems==='function'){const priorNavItems=navItems;navItems=function(){return priorNavItems().map(([p,_i,l])=>[p,svgIcon(p),l])}}
+
+  function months(n=6){const out=[],d=new Date();d.setDate(1);for(let i=n-1;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth()-i,1);out.push({key:`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`,label:x.toLocaleDateString('en-GB',{month:'short'})})}return out}
+  function series(items,dateKey,valueFn){return months(6).map(m=>({label:m.label,value:items.filter(x=>String(x[dateKey]||'').startsWith(m.key)).reduce((a,x)=>a+valueFn(x),0)}))}
+  function bars(rows,kind){const max=Math.max(1,...rows.map(x=>Number(x.value||0)));return `<div class="v3-bars ${kind}">${rows.map(x=>`<div class="v3-bar-col"><b>${kind==='revenue'&&x.value?cash(x.value):x.value||''}</b><div><i style="height:${Math.max(x.value?8:2,Math.round(Number(x.value||0)/max*100))}%"></i></div><span>${E(x.label)}</span></div>`).join('')}</div>`}
+  function planMix(ms){const plans=[...new Set(ms.map(m=>m.current_plan_name||'Inactive'))],max=Math.max(1,...plans.map(p=>ms.filter(m=>(m.current_plan_name||'Inactive')===p).length));return `<div class="v3-plan-list">${plans.map((p,i)=>{const n=ms.filter(m=>(m.current_plan_name||'Inactive')===p).length;return `<div class="v3-plan-row"><span><i class="v3-plan-dot c${i%5}"></i>${E(p)}</span><div><i class="c${i%5}" style="width:${Math.round(n/max*100)}%"></i></div><b>${n}</b></div>`}).join('')}</div>`}
+  function healthRing(ms){const total=Math.max(1,ms.length),active=ms.filter(m=>stat(m).label==='ACTIVE').length,soon=ms.filter(m=>stat(m).label==='EXPIRING SOON').length,expired=ms.filter(m=>stat(m).label==='EXPIRED').length,inactive=Math.max(0,ms.length-active-soon-expired),a=Math.round(active/total*100),s=a+Math.round(soon/total*100),e=s+Math.round(expired/total*100);return `<div class="v3-health-wrap"><div class="v3-health-ring" style="background:conic-gradient(#39d98a 0 ${a}%,#ffc857 ${a}% ${s}%,#ff5d73 ${s}% ${e}%,#7e8798 ${e}% 100%)"><div><strong>${Math.round((active+soon)/total*100)}%</strong><span>healthy</span></div></div><div class="v3-health-legend"><span><i class="green"></i>Active <b>${active}</b></span><span><i class="amber"></i>Expiring <b>${soon}</b></span><span><i class="red"></i>Expired <b>${expired}</b></span><span><i class="grey"></i>Inactive <b>${inactive}</b></span></div></div>`}
+  function urgency(ms){let expired=0,d3=0,d7=0,d30=0;ms.forEach(m=>{const s=stat(m),d=Number(s.days);if(s.label==='EXPIRED'||d<=0)expired++;else if(d<=3)d3++;else if(d<=7)d7++;else if(d<=30)d30++});const total=Math.max(1,expired+d3+d7+d30);return `<div class="v3-radar"><div class="v3-radar-stack"><i class="expired" style="width:${expired/total*100}%"></i><i class="d3" style="width:${d3/total*100}%"></i><i class="d7" style="width:${d7/total*100}%"></i><i class="d30" style="width:${d30/total*100}%"></i></div><div class="v3-radar-grid"><button onclick="go('renewals')"><span class="red">●</span><b>${expired}</b><small>Expired</small></button><button onclick="go('renewals')"><span class="orange">●</span><b>${d3}</b><small>≤ 3 days</small></button><button onclick="go('renewals')"><span class="amber">●</span><b>${d7}</b><small>4–7 days</small></button><button onclick="go('renewals')"><span class="blue">●</span><b>${d30}</b><small>8–30 days</small></button></div></div>`}
+  function attentionCards(ms){const rows=ms.filter(m=>{const s=stat(m);return s.label==='EXPIRED'||s.label==='EXPIRING SOON'||Number(s.days??999)<=7}).sort((a,b)=>Number(stat(a).days??999)-Number(stat(b).days??999)).slice(0,4);if(!rows.length)return '<div class="v3-all-clear"><span>✓</span><div><b>Renewal queue is clear</b><small>No urgent subscriptions need attention.</small></div></div>';return `<div class="v3-attention-list">${rows.map(m=>{const s=stat(m),d=Number(s.days??0);return `<button class="v3-attention" onclick="openMemberProfile('${m.id}')">${avatar(m,'v3-mini-avatar')}<div><b>${E(m.full_name)}</b><span>${E(m.current_plan_name||'No plan')} · ${E(m.member_code)}</span></div><strong class="${d<=3?'danger':'warn'}">${s.label==='EXPIRED'?'Expired':`${d}d`}</strong></button>`}).join('')}</div>`}
+  function auditFeed(){const rows=(data?.audit||[]).slice(0,6);if(!rows.length)return '<div class="v3-empty-feed">Activity will appear here as your team uses the system.</div>';const icon=a=>a.includes('PAYMENT')?'₦':a.includes('MEMBER')?'●':a.includes('BREAK')?'★':a.includes('STAFF')?'◆':a.includes('BACKUP')?'↓':'•';return `<div class="v3-activity">${rows.map(r=>`<div class="v3-activity-row"><span>${icon(String(r.action||''))}</span><div><b>${E(String(r.action||'Activity').replaceAll('_',' '))}</b><small>${E(r.actor_name||'System')} · ${new Date(r.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</small></div></div>`).join('')}</div>`}
+  function winners(ms){const rows=[...ms].filter(m=>Number(m.break_run_wins||0)>0).sort((a,b)=>Number(b.break_run_wins||0)-Number(a.break_run_wins||0)).slice(0,3);if(!rows.length)return '<div class="v3-empty-feed">Break & Run winners will be celebrated here.</div>';return `<div class="v3-winners">${rows.map((m,i)=>`<button onclick="openMemberProfile('${m.id}')"><span class="v3-rank">${['Ⅰ','Ⅱ','Ⅲ'][i]||i+1}</span>${avatar(m,'v3-winner-avatar')}<div><b>${E(m.full_name)}</b><small>${Number(m.break_run_wins||0)} win${Number(m.break_run_wins||0)===1?'':'s'}</small></div><span class="v3-trophy">★</span></button>`).join('')}</div>`}
+
+  dashboardView=function(){
+    const ms=data?.members||[],ps=data?.payments||[],paid=ps.filter(p=>p.payment_status==='Paid'),now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,active=ms.filter(m=>stat(m).label==='ACTIVE').length,soon=ms.filter(m=>stat(m).label==='EXPIRING SOON').length,paused=ms.filter(m=>m.perk_paused).length,newThis=ms.filter(m=>String(m.registered_at||'').startsWith(ym)).length,revenue=paid.reduce((a,p)=>a+Number(p.amount||0),0),revMonth=paid.filter(p=>String(p.payment_date||'').startsWith(ym)).reduce((a,p)=>a+Number(p.amount||0),0),attention=ms.filter(m=>['EXPIRING SOON','EXPIRED'].includes(stat(m).label)||Number(stat(m).days??999)<=7).length,revSeries=series(paid,'payment_date',p=>Number(p.amount||0)),growthSeries=series(ms,'registered_at',()=>1),hour=now.getHours(),greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+    return `<section class="v3-dashboard"><div class="v3-hero v3-glass"><div class="v3-hero-orb o1"></div><div class="v3-hero-orb o2"></div><div class="v3-hero-orb o3"></div><div class="v3-hero-copy"><div class="v3-live-pill"><i></i>D12 LIVE MEMBERSHIP</div><h2>${greeting}. <span>Your club is in motion.</span></h2><p>Everything important about membership health, revenue and renewals—beautifully visible in one place.</p><div class="v3-hero-actions"><button class="btn primary" onclick="openMemberModal()">＋ New Member</button><button class="btn v3-glow-btn" onclick="go('payments')">₦ Record Payment</button><button class="btn v3-glow-btn" onclick="go('scanner')">Scan Card</button><button class="btn v3-glow-btn" onclick="go('renewals')">Renewals ${attention?`<b>${attention}</b>`:''}</button></div></div><div class="v3-hero-brand"><img src="${logo()}" alt="D12 Cue Club"><div><span>${now.toLocaleDateString('en-GB',{weekday:'long'})}</span><b>${now.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</b><small>Membership Command Centre · V3</small></div></div></div><div class="v3-kpis"><button class="v3-kpi green" onclick="setMemberFilter('ACTIVE')"><span class="v3-kpi-icon">✓</span><div><small>Active Members</small><b>${active}</b><em>Healthy subscriptions</em></div></button><button class="v3-kpi amber" onclick="setMemberFilter('EXPIRING SOON')"><span class="v3-kpi-icon">◷</span><div><small>Expiring Soon</small><b>${soon}</b><em>Needs attention</em></div></button><button class="v3-kpi violet" onclick="setMemberFilter('paused')"><span class="v3-kpi-icon">Ⅱ</span><div><small>Paused Perks</small><b>${paused}</b><em>Break & Run holds</em></div></button><button class="v3-kpi cyan" onclick="go('members')"><span class="v3-kpi-icon">＋</span><div><small>New This Month</small><b>${newThis}</b><em>${ms.length} total members</em></div></button><div class="v3-kpi blue"><span class="v3-kpi-icon">₦</span><div><small>Revenue This Month</small><b>${cash(revMonth)}</b><em>${cash(revenue)} verified total</em></div></div></div><div class="v3-dashboard-grid"><article class="v3-panel v3-glass"><header><div><small>MEMBERSHIP HEALTH</small><h3>Club pulse</h3></div><span class="v3-panel-tag">Live</span></header>${healthRing(ms)}</article><article class="v3-panel v3-glass"><header><div><small>FINANCIAL MOMENTUM</small><h3>6-month revenue</h3></div><b>${cash(revMonth)}</b></header>${bars(revSeries,'revenue')}</article><article class="v3-panel v3-glass"><header><div><small>GROWTH</small><h3>New membership trend</h3></div><b>${newThis} this month</b></header>${bars(growthSeries,'growth')}</article><article class="v3-panel v3-glass"><header><div><small>PLAN MIX</small><h3>What members choose</h3></div></header>${planMix(ms)}</article><article class="v3-panel v3-glass v3-wide"><header><div><small>RENEWAL RADAR</small><h3>Subscription urgency</h3></div><button class="v3-text-btn" onclick="go('renewals')">Open centre →</button></header>${urgency(ms)}</article><article class="v3-panel v3-glass"><header><div><small>NEEDS ATTENTION</small><h3>Renewal watch</h3></div><span class="v3-panel-tag warn">${attention}</span></header>${attentionCards(ms)}</article><article class="v3-panel v3-glass"><header><div><small>BREAK & RUN</small><h3>Winner spotlight</h3></div><span class="v3-panel-tag gold">★</span></header>${winners(ms)}</article><article class="v3-panel v3-glass v3-wide"><header><div><small>RECENT ACTIVITY</small><h3>What just happened</h3></div><button class="v3-text-btn" onclick="go('audit')">Audit log →</button></header>${auditFeed()}</article></div></section>`
+  };
+
+  if(typeof settingsView==='function'){const priorSettings=settingsView;settingsView=function(){return priorSettings()+`<div class="card section v3-sound-settings"><div class="row split"><div><h2>Interaction Sounds</h2><p class="muted">Professional confirmation tones for registration, payments, reminders, scanning and other important actions. Saved on this device.</p></div><div class="v3-sound-control"><label class="glass-switch"><input id="v3SoundToggle" type="checkbox" ${soundsOn()?'checked':''}><span class="glass-switch-track"><span class="glass-switch-thumb"></span></span><b>${soundsOn()?'ON':'OFF'}</b></label><button class="btn small" type="button" onclick="playD12Sound('member')">Preview</button></div></div></div>`}}
+  if(typeof wireView==='function'){const priorWire=wireView;wireView=function(){priorWire();const t=document.querySelector('#v3SoundToggle');if(t)t.addEventListener('change',e=>{localStorage.setItem(SOUND_KEY,e.target.checked?'on':'off');const b=e.target.closest('.glass-switch')?.querySelector('b');if(b)b.textContent=e.target.checked?'ON':'OFF';if(e.target.checked)playSound('save');toast(`Interaction sounds ${e.target.checked?'enabled':'disabled'}.`)})}}
+  if(typeof render==='function'){const priorRender=render;render=function(){const out=priorRender.apply(this,arguments);document.documentElement.dataset.d12Version=VERSION;requestAnimationFrame(()=>{document.querySelectorAll('.brand small').forEach(x=>x.textContent='Membership V3');if(typeof page!=='undefined'&&page==='dashboard'){const title=document.querySelector('#pageTitle'),sub=document.querySelector('#pageSub');if(title)title.textContent='Dashboard';if(sub)sub.textContent='Your D12 membership command centre.'}});return out}}
+  document.documentElement.dataset.d12Version=VERSION;
+})();
