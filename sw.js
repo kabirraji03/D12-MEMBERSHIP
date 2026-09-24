@@ -1,4 +1,4 @@
-const CACHE='d12-membership-v3-3000';
+const CACHE='d12-membership-v3-3001';
 const CORE=['./','./index.html','./app-v2-2.css','./patch-v2-3-1.css','./patch-v2-3-2.css','./patch-v2-4.css','./patch-v2-4-1.css','./patch-v2-4-2.css','./patch-v3.css','./logo-data-1.js','./logo-data-2.js','./logo-data-3.js','./logo-data-4.js','./app-v2-2-a.js','./app-v2-2-b.js','./app-v2-2-patch.js','./patch-v2-3.js','./patch-v2-3-1.js','./patch-v2-3-2.js','./patch-v2-4.js','./patch-v2-4-hotfix.js','./patch-v2-4-stability.js','./patch-v2-4-1.js','./patch-v2-4-2.js','./patch-v3.js','./manifest.webmanifest','./d12-app-icon.svg'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE).catch(()=>{})));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
