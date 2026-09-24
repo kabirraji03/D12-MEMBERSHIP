@@ -1,7 +1,7 @@
 {
-  "name": "D12 Cue Club Membership",
+  "name": "D12 Cue Club Membership V3",
   "short_name": "D12 Membership",
-  "description": "D12 Cue Club membership management, member cards, renewals, payments and scanner.",
+  "description": "D12 Cue Club Version 3 membership command centre for members, payments, renewals, cards, reports and scanning.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
