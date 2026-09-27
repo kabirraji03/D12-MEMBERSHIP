@@ -1,0 +1,13 @@
+{
+  "name": "D12 PLAYERS TURN",
+  "short_name": "D12 Turns",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07120f",
+  "theme_color": "#07120f",
+  "description": "Realtime D12 Cue Club player queue, cashier, rackmaster and turn alert system.",
+  "icons": [
+    {"src":"../d12-app-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
