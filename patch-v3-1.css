@@ -1,0 +1,88 @@
+/* D12 Membership V3.0.1 — clean branding + mobile/tablet nav containment */
+.brand>small{display:none!important}
+#topActions .install-app-btn{display:none!important}
+.v3-hero-brand small{display:none!important}
+
+/* Keep every navigation item fully inside its own touch cell */
+.nav button,.mobile-nav button{box-sizing:border-box!important;overflow:hidden!important}
+.nav button .v3-nav-icon,.mobile-nav button .v3-nav-icon{box-sizing:border-box!important;flex-shrink:0!important}
+
+@media(max-width:1050px){
+  .mobile-nav{align-items:stretch!important}
+  .mobile-nav button{
+    flex:0 0 98px!important;
+    width:98px!important;
+    min-width:98px!important;
+    max-width:98px!important;
+    min-height:78px!important;
+    padding:7px 6px!important;
+    grid-template-rows:42px minmax(18px,auto)!important;
+    align-content:center!important;
+    justify-items:center!important;
+    gap:4px!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+    text-align:center!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+  }
+  .mobile-nav .v3-nav-icon{
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+    max-width:40px!important;
+    margin:0 auto!important;
+    border-radius:13px!important;
+    overflow:hidden!important;
+  }
+  .mobile-nav .v3-nav-icon svg{width:21px!important;height:21px!important;display:block!important}
+}
+
+@media(min-width:621px) and (max-width:1050px){
+  .mobile-nav button{
+    flex-basis:106px!important;
+    width:106px!important;
+    min-width:106px!important;
+    max-width:106px!important;
+    min-height:82px!important;
+    font-size:11px!important;
+  }
+  .mobile-nav .v3-nav-icon{width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important}
+}
+
+@media(max-width:620px){
+  .mobile-nav{gap:6px!important;padding-left:7px!important;padding-right:7px!important}
+  .mobile-nav button{
+    flex-basis:92px!important;
+    width:92px!important;
+    min-width:92px!important;
+    max-width:92px!important;
+    min-height:76px!important;
+    font-size:10px!important;
+  }
+}
+
+@media(max-width:950px) and (orientation:landscape) and (max-height:600px){
+  .mobile-nav{
+    width:104px!important;
+    padding:7px!important;
+    align-items:center!important;
+  }
+  .mobile-nav button{
+    flex:0 0 78px!important;
+    width:88px!important;
+    min-width:88px!important;
+    max-width:88px!important;
+    min-height:78px!important;
+    grid-template-rows:38px minmax(18px,auto)!important;
+    padding:6px 5px!important;
+    font-size:9.5px!important;
+  }
+  .mobile-nav .v3-nav-icon{
+    width:37px!important;
+    height:37px!important;
+    min-width:37px!important;
+    max-width:37px!important;
+  }
+  main{padding-left:124px!important}
+}
