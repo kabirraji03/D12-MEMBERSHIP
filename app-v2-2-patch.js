@@ -1,2 +1,3 @@
 attachSearch=function(){const el=$('#memberSearch');if(el)el.addEventListener('input',e=>{searchTerm=e.target.value;const host=$('#memberTableHost');if(host)host.outerHTML=memberStatusTable(filteredMembers(),role==='admin')})};
 setInterval(async()=>{if(role==='member'&&token){try{data=await request('bootstrap');render()}catch(x){logoutLocal(true);toast(x.message)}}},60000);
+window.addEventListener('load',()=>{if(document.querySelector('script[data-d12-v301]'))return;const s=document.createElement('script');s.src='patch-v3-0-1.js?v=3010';s.dataset.d12V301='1';s.async=false;document.body.appendChild(s)});
