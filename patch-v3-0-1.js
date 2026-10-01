@@ -54,7 +54,7 @@
     const priorNavItems=navItems;
     navItems=function(){
       const items=priorNavItems.apply(this,arguments)||[];
-      if(typeof role!=='undefined'&&role==='staff'&&(staffCan('view_members')||staffCan('renewals'))&&!items.some(x=>x?.[0]==='renewals')){
+      if(typeof role!=='undefined'&&role==='staff'&&!items.some(x=>x?.[0]==='renewals')){
         const idx=items.findIndex(x=>['payments','scanner'].includes(x?.[0]));
         const item=['renewals',renewalIcon,'Renewals'];
         if(idx>=0)items.splice(idx,0,item);else items.push(item);
