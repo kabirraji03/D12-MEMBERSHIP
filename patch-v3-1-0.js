@@ -125,7 +125,11 @@
   }
   if(typeof membersView==='function'){
     const priorMembersView=membersView;
-    membersView=function(){return identityCentre()+priorMembersView.apply(this,arguments)};
+    membersView=function(){
+      const html=priorMembersView.apply(this,arguments);
+      const cleaned=String(html).replace('<button class="btn small" onclick="document.getElementById(\'csvFile\').click()">Import CSV</button>','');
+      return identityCentre()+cleaned;
+    };
   }
   window.linkLegacyMember310=async function(memberId){
     if(!isAdmin())return toast('Admin access required.');
