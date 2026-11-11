@@ -1,7 +1,7 @@
 {
-  "name": "D12 Cue Club Membership V3",
+  "name": "D12 Cue Club Membership V3.1",
   "short_name": "D12 Membership",
-  "description": "D12 Cue Club Version 3 membership command centre for members, payments, renewals, cards, reports and scanning.",
+  "description": "D12 Cue Club membership management with shared PlayersTurn identity, subscriptions, payments, renewals, cards, reports and scanning.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,6 +9,11 @@
   "theme_color": "#07111f",
   "orientation": "any",
   "icons": [
-    {"src":"d12-app-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+    {
+      "src": "d12-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }
